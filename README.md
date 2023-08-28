@@ -25,9 +25,10 @@ Before proceeding to deploy our app, we have some steps to take care of:
 
 - Create a GitHub account [GitHub](https://repo.new)
 - Create a new app on Fly
+- If you want the app to be created in an organization, pick the right one when calling the following command:
 
 ```bash
-flyctl launch --name [YOUR-APP-NAME] --copy-config --no-deploy
+flyctl launch --name baddyapp --copy-config --no-deploy
 ```
 
 > ⚠️ **Note:** Make sure this name matches the `app` set in your `fly.toml` file. Otherwise, you will not be able to deploy.
@@ -58,16 +59,16 @@ flyctl secrets set SECRET=$(openssl rand -hex 32)
 ```
 
 ```bash
-flyctl secrets set ADMIN_EMAIL=[YOUR@EMAIL.com]
+flyctl secrets set ADMIN_EMAIL=admin@hairyturtle.com
 flyctl secrets set ADMIN_PASSWORD=[YOUR-ADMIN-PASSWORD]
 ```
 
 The last secret, is your `PUBLIC_URL`, you can get the initial domain from fly by typing: `flyctl info`
 
-To get the current app URL and IP address. The app URL will be `https://YOUR-APP-NAME.fly.dev`. 
+To get the current app URL and IP address. The app URL will be `https://baddyapp.fly.dev`. 
 
 ```bash
-flyctl secrets set PUBLIC_URL=https://[YOUR-APP-NAME].fly.dev
+flyctl secrets set PUBLIC_URL=https://baddyapp.fly.dev
 ```
 
 You can change this by following Fly's DNS docs and then just update the secret anytime
@@ -77,7 +78,7 @@ You can change this by following Fly's DNS docs and then just update the secret 
 We also need to create a volume in Fly to persist our app data (SQLite DB) so that Fly can persist the data stored across deployments and container restarts. Again, we can do that using the Fly command line.
 
 ```bash
-flyctl volumes create data --region [REGION] --size 1
+flyctl volumes create data --region syd --size 1
 ```
 
 > Note: REGION should be the region selected when launching the app. You can check the region chosen by running `flyctl regions list`.
@@ -101,7 +102,7 @@ We are ready for our first deployment.
 
 You have two ways to deploy:
 
-- Via `npm run deploy`: deploy the current folder
+- Via `npm run deploy`: deploy the current folder (this has memory set to 512MB, otherwise Directus will crash with OOM)
 - Via Github actions.
 
 GitHub actions workflows are configured to run on push to the `main` branch. 
@@ -133,3 +134,19 @@ There are two ways to add extensions:
 2. Installed inside the `extensions` folder.
 
 This works the same as any other Directus installation
+
+### Handling app crash (OOM)
+
+When you can't login, it may be that Directus crashed due to out-of-memory error.
+
+To address this, we need to bump the RAM beyond the currently set 512MB. Run this command:
+
+```bash
+flyctl scale memory 512 -a baddyapp
+```
+
+Then, recreate the volume so that Directus can bootstrap from scratch again.
+
+```bash
+flyctl volume list -a baddyapp | grep data | awk '{print $1}' | xargs flyctl volumes destroy
+```

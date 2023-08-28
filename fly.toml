@@ -1,8 +1,12 @@
-# fly.toml file generated for directusfly on 2022-09-14T05:00:58Z
+# fly.toml app configuration file generated for baddyapp on 2023-08-21T21:29:26+10:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-app = "directusfly"
+app = "baddyapp"
+primary_region = "syd"
 kill_signal = "SIGINT"
-kill_timeout = 5
+kill_timeout = "5s"
 processes = []
 
 [env]
@@ -11,7 +15,7 @@ processes = []
   STORAGE_LOCATIONS = "local"
   STORAGE_LOCAL_DRIVER = "local"
   STORAGE_LOCAL_ROOT = "/data/uploads"
-  FLY_PRIMARY_REGION = "sea"
+  FLY_PRIMARY_REGION = "syd"
   PORT = 6055
 
 [experimental]
@@ -56,5 +60,5 @@ processes = []
   [[services.tcp_checks]]
     grace_period = "1s"
     interval = "15s"
-    restart_limit = 0
+    restart_limit = 5
     timeout = "2s"

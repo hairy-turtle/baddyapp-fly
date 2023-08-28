@@ -37,6 +37,9 @@ WORKDIR /myapp
 
 COPY --from=production-deps /myapp/node_modules /myapp/node_modules
 
+# Copy all extensions, including displays, endpoints, hooks, interfaces, layouts, modules, operations and panels
+COPY extensions/layouts/ /myapp/extensions/layouts/
+
 ADD . .
 
 CMD ["bash", "start.sh"]

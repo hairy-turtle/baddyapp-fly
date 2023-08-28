@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Directus on fly.io starter",
   "scripts": {
-    "deploy": "fly deploy --remote-only",
+    "deploy": "fly deploy --remote-only --vm-memory 512",
     "start": "npx directus start"
   },
   "dependencies": {
